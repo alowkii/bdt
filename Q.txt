@@ -1,0 +1,36 @@
+17
+import org.apache.spark.{SparkConf, SparkContext}
+
+object WordCount {
+def main(args: Array[String]): Unit = {
+// Step 1: Set up the Spark context
+val conf = new SparkConf().setAppName("WordCount").setMaster("local")
+val sc = new SparkContext(conf)
+
+// Step 2: Read the text file into an RDD
+val inputFile = "path/to/text.txt" // Replace with the path to your text file
+val lines = sc.textFile(inputFile)
+
+// Step 3: Split lines into words and map each word to a pair (word, 1)
+val words = lines.flatMap(line => line.split("\\W+")) // Split on non-word characters
+val wordPairs = words.map(word => (word.toLowerCase, 1))
+
+// Step 4: Reduce the pairs by key to get the word counts
+val wordCounts = wordPairs.reduceByKey(_ + _)
+
+// Step 5: Filter words that appear more than 4 times
+val frequentWords = wordCounts.filter { case (word, count) => count > 4 }
+
+// Step 6: Save the result to a file
+val outputFile = "path/to/output" // Replace with the desired output directory
+frequentWords.saveAsTextFile(outputFile)
+
+// Step 7: Collect and display the frequent words
+val result = frequentWords.collect()
+println("Words that appear more than 4 times:")
+result.foreach { case (word, count) => println(s"$word: $count") }
+
+// Stop the Spark context
+sc.stop()
+}
+}
