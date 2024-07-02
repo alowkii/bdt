@@ -1,0 +1,7 @@
+def wordLengths(words: Array[String]): Array[Int] = {
+  words.map(_.length)
+}
+
+// Example usage:
+val words = Array("apple", "banana", "cherry")
+println(wordLengths(words).mkString(", "))
